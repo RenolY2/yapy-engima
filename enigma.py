@@ -110,6 +110,10 @@ class EnigmaMachine(object):
     def push_key(self, letter):
         if letter == " ":
             return letter
+        letter = letter.upper()
+        if letter not in ALPHABET:
+            letter = "X"
+            
         # Plugboard
         letter = self._plug(letter)
         
@@ -124,7 +128,15 @@ class EnigmaMachine(object):
             next_rotor_steps = rotor.turnover()
             if curr_rotor_steps:
                 rotor.advance()
-            curr_rotor_steps = next_rotor_steps
+                curr_rotor_steps = next_rotor_steps
+                
+            elif i == 1:
+                # Implement double-stepping for middle rotor 
+                if next_rotor_steps:
+                    rotor.advance()
+                curr_rotor_steps = next_rotor_steps
+            else:
+                curr_rotor_steps = False
         
         # Encode letter
         for rotor in reversed(self.rotors):
@@ -247,7 +259,7 @@ if __name__ == "__main__":
     val = enigma.encode("EDPUD NRGYS ZRCXN UYTPO MRMBO FKTBZ REZKM LXLVE FGUEY SIOZV EQMIK UBPMM YLKLT TDEIS MDICA GYKUA CTCDO MOHWX MUUIA UBSTS LRNBZ SZWNR FXWFY SSXJZ VIJHI DISHP RKLKA YUPAD TXQSP INQMA TLPIF SVKDA SCTAC DPBOP VHJK")
     print(val)"""
     
-    enigma = EnigmaMachine(
+    """enigma = EnigmaMachine(
         refrail, 
         [rotorrailIII, rotorrailI, rotorrailII], 
         Stator(ALPHABET, "jwulcmnohpqzyxiradkegvbtsf".upper()),
@@ -256,8 +268,27 @@ if __name__ == "__main__":
     enigma.set_rotor_state("JEZA")
     enigma.set_ring(26-1,17-1, 16-1, 13-1)
     val = enigma.encode("QSZVI DVMPN EXACM RWWXU IYOTY NGVVX DZ")
-    print(val)
+    print(val)"""
     
+    """enigma_m4 = EnigmaMachine(
+        refbthin, 
+        [beta, rotor(II), rotor(IV), rotor(I)], 
+        etw_army,
+        plugboard = ["AT", "BL", "DF", "GJ", "HM", "NW", "OP", "QY", "RZ", "VX"])
+        
+    enigma_m4.set_rotor_state("VJNA")
+    enigma_m4.set_ring(1-1,1-1, 1-1, 22-1)
+    val = enigma_m4.encode("NCZW VUSX PNYM INHZ XMQX SFWX WLKJ AHSH NMCO CCAK UQPM KCSM HKSE INJU SBLK IOSX CKUB HMLL XCSJ USRR DVKO HULX WCCB GVLI YXEO AHXR HKKF VDRE WEZL XOBA FGYU JQUK GRTV UKAM EURB VEKS UHHV OYHA BCJW MAKL FKLM YFVN RIZR VVRT KOFD ANJM OLBG FFLE OPRG TFLV RHOW OPBE KVWM UQFM PWPA RMFH AGKX IIBG")
+    print(val)"""
+    
+    enigma = EnigmaMachine(refb, [rotor(III), rotor(II), rotor(I)])
+    enigma.set_rotor_state("ABC")
+    enigma.set_ring(1-1, 2-1, 3-1)
+    val = enigma.encode("I've come to make an announcement, Shadow the Hedgehog's a bitch-ass motherfucker! He pissed on my fucking wife! That's right, he took his hedgehog-fuckin' quilly dick out and he pissed on my fucking wife, and he said his dick was \"this big,\" and I said \"that's disgusting,\" so I'm making a callout post on my Twitter.com: Shadow the Hedgehog, you've got a small dick, It's the size of this walnut except WAY smaller. And guess what? Here's what my dong looks like: that's right baby, tall points, no quills, no pillows— look at that, it looks like two balls and a bong. He fucked my wife, so guess what, I'm gonna fuck the EARTH. That's right, this is what you get: MY SUPER LASER PISS!! Except I'm not gonna piss on the Earth, I'm gonna go higher; I'm pissing ON THE MOON! How do you like that, Obama? I PISSED ON THE MOON, YOU IDIOT! You have twenty-three hours before the piss drrrrroplllllllets hit the fucking Earth, now get outta my fucking sight, before I piss on you too!")
+    #val = enigma.encode("mxfie srwzg toiui ekkdc shtpy oepvx nhvrw wesfr uxdgw ozdmn kizwn czduc obltu yhdzg ovbuy pkojw bowse emtzf wygko dtbzd qrczc if")
+    #val = enigma.encode("bdzgo wcxlt ksbtm cdlpb muqof xyhcx tgyjf linhn xshiu ntheo rxpqp kovhc bubtz szsoo stgot fsodb bzzlx lcyzx ifgwf dzeeq ibmgf jbwzf ckpfm gbxqc ivibb rncoc juvyd kmvjp fmdrm tglwf ozlxg jeyyq pvpbw nckvk lztcb dldct snrco ovptg bvbbi sgjso yhden ctnuu kcugh revwb djctq xxogl ebzmd brzos xdtzs zbgdc fprbz yqgsn cchgy ewohv jbyzg kdgyn neuji wctyc ytuum boyvu nnquk ksobs corsu oscnv roqlh eudsu kymig ibsxp ihntu vgghi fqtgz xlgyq cnvns rclvp yosvr bkcex rnlgd ywebf xivkk tugkp vmzot uogmh hzdre kjhle fkkpo xlwbw vbyuk dtquh dqtre vrqjm qwndo vwljh ccxcf xrppx msjez cjuft brzzm cssnj nyl")
+        
+    print(val)
     
     
     """assert len(ALPHABET) == 26
