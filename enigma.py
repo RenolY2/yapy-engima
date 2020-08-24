@@ -1,4 +1,7 @@
-from io import StringIO
+import base64
+from io import StringIO, BytesIO
+from struct import pack 
+
 
 ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 I = 1
@@ -10,9 +13,14 @@ VI = 6
 VII = 7
 VIII = 8
 
+
 def offset(letter):
     return ALPHABET.find(letter)
+    
 
+def offsets(letters):
+    return (offset(x) for x in letters)
+    
 
 class RotorPiece(object):
     def __init__(self, in_map, out_map, ring_setting, turnover_at, turnover_at2=None):
@@ -108,7 +116,7 @@ class EnigmaMachine(object):
             return letter 
     
     def push_key(self, letter):
-        if letter == " ":
+        if not letter.strip():
             return letter
         letter = letter.upper()
         if letter not in ALPHABET:
@@ -197,6 +205,65 @@ class EnigmaMachine(object):
             return ALPHABET[self.reflector.rotation] + "".join(ALPHABET[rotor.rotation] for rotor in self.rotors)
 
 
+map = {"2": "XA",
+       "3": "XB",
+       "4": "XC",
+       "5": "XD",
+       "6": "XE",
+       "7": "XF",
+       "=": "XG",
+       "X": "XX"}
+
+unescape = {"A": "2",
+       "B": "3",
+       "C": "4",
+       "D": "5",
+       "E": "6",
+       "F": "7",
+       "G": "=",
+       "X": "X"}
+
+
+
+class ArbitraryDataEnigma(object):
+    def __init__(self, enigma):
+        self.enigma = enigma 
+    
+    def encode(self, data):
+        newdata = StringIO()
+        b32result = base64.b32encode(data).decode("ascii")
+        
+        for symbol in b32result:
+            if symbol in map:
+                newdata.write(map[symbol])
+            else:
+                newdata.write(symbol)
+                
+        return self.enigma.encode(newdata.getvalue())
+    
+    def decode(self, data):
+        decodeddata = self.enigma.encode(data)
+        newdata = StringIO()
+        
+        next_escape = False 
+        
+        for symbol in decodeddata:
+            if not next_escape:
+                if symbol == "X":
+                    next_escape = True 
+                else:
+                    newdata.write(symbol)
+            else:
+                if symbol not in unescape:
+                    raise RuntimeError("Invalid escape sequence")
+                
+                symbol = unescape[symbol]
+                newdata.write(symbol)
+                next_escape = False 
+                
+        return base64.b32decode(newdata.getvalue())
+
+
 def rotor(num, off=offset("A")):
     if num == 1:
         return RotorPiece(ALPHABET, "EKMFLGDQVZNTOWYHXUSPAIBRCJ", off, offset("Q"))
@@ -270,7 +337,7 @@ if __name__ == "__main__":
     val = enigma.encode("QSZVI DVMPN EXACM RWWXU IYOTY NGVVX DZ")
     print(val)"""
     
-    enigma_m4 = EnigmaMachine(
+    """enigma_m4 = EnigmaMachine(
         refbthin, 
         [beta, rotor(II), rotor(IV), rotor(I)], 
         etw_army,
@@ -279,33 +346,29 @@ if __name__ == "__main__":
     enigma_m4.set_rotor_state("VJNA")
     enigma_m4.set_ring(1-1,1-1, 1-1, 22-1)
     val = enigma_m4.encode("NCZW VUSX PNYM INHZ XMQX SFWX WLKJ AHSH NMCO CCAK UQPM KCSM HKSE INJU SBLK IOSX CKUB HMLL XCSJ USRR DVKO HULX WCCB GVLI YXEO AHXR HKKF VDRE WEZL XOBA FGYU JQUK GRTV UKAM EURB VEKS UHHV OYHA BCJW MAKL FKLM YFVN RIZR VVRT KOFD ANJM OLBG FFLE OPRG TFLV RHOW OPBE KVWM UQFM PWPA RMFH AGKX IIBG")
-    print(val)
-
+    print(val)"""
+    
+    """enigma_m4 = EnigmaMachine(
+        refcthin, 
+        [beta, rotor(V), rotor(VI), rotor(VIII)], 
+        etw_army,
+        plugboard = ["AE", "BF", "CM", "DQ", "HU", "JN", "LX", "PR", "SZ", "VW"])
+        
+    #enigma_m4.set_rotor_state("CDSZ")
+    #enigma_m4.set_ring(*offsets("EPEL"))
+    #print(enigma_m4.encode("LANO TCTO UARB BFPM HPHG CZXT DYGA HGUF XGEW KBLK GJWL QXXT"))
+    #print(enigma_m4.get_rotor_state())
+    
+    enigma_m4.set_rotor_state("CDSZ")
+    enigma_m4.set_ring(*offsets("EPEL"))
+    
+    print(enigma_m4.encode("LANO TCTO UARB BFPM HPHG CZXT DYGA HGUF XGEW KBLK GJWL QXXT
+    GPJJ AVTO CKZF SLPP QIHZ FXOE BWII EKFZ LCLO AQJU LJOY HSSM BBGW HZAN
+    VOII PYRB RTDJ QDJJ OQKC XWDN BBTY VXLY TAPG VEAT XSON PNYN QFUD BBHH
+    VWEP YEYD OHNL XKZD NWRH DUWU JUMW WVII WZXI VIUQ DRHY MNCY EFUA PNHO
+    TKHK GDNP SAKN UAGH JZSM JBMH VTRE QEDG XHLZ WIFU SKDQ VELN MIMI THBH
+    DBWV HDFY HJOQ IHOR TDJD BWXE MEAY XGYQ XOHF DMYU XXNO JAZR SGHP LWML
+    RECW WUTL RTTV LBHY OORG LGOW UXNX HMHY FAAC QEKT HSJW "))
+    print(enigma_m4.get_rotor_state())"""
     
     
-    """assert len(ALPHABET) == 26
-    for i, letter in enumerate(ALPHABET):
-        assert refb.encode(letter) == "YRUHQSLDPXNGOKMIEBFZCWVJAT"[i]
-        assert refc.encode(letter) == "FVPJIAOYEDRZXWGCTKUQSBNMHL"[i]
-    
-    out = "".join(rotorI.encode(x) for x in ALPHABET)
-    print(out)
-    assert out == "EKMFLGDQVZNTOWYHXUSPAIBRCJ"
-    print(rotorI.encode("A"))
-    assert rotorI.encode("A") == "E"
-    rotorI.rotation = 1 #B 
-    print(rotorI.encode("A"))
-    assert rotorI.encode("A") == "J"
-    
-    print("=====")
-    rotorI.rotation = 0 # A 
-    rotorI.ring_setting = 1 # B
-    
-    print(rotorI.encode("A"))
-    
-    
-    rotorI.rotation = ALPHABET.find("Y") # Y
-    rotorI.ring_setting = 5 # F
-    print(rotorI.encode("A"))"""
-
-    #print(enigma.encode("A"))
