@@ -1,4 +1,5 @@
 import base64
+from random import random 
 from io import StringIO, BytesIO
 from struct import pack 
 
@@ -211,7 +212,7 @@ map = {"2": "XA",
        "5": "XD",
        "6": "XE",
        "7": "XF",
-       "=": "XG",
+       #"=": "XG",
        "X": "XX"}
 
 unescape = {"A": "2",
@@ -220,7 +221,7 @@ unescape = {"A": "2",
        "D": "5",
        "E": "6",
        "F": "7",
-       "G": "=",
+       #"G": "=",
        "X": "X"}
 
 
@@ -232,11 +233,18 @@ class ArbitraryDataEnigma(object):
     def encode(self, data):
         newdata = StringIO()
         b32result = base64.b32encode(data).decode("ascii")
-        
+            
         for symbol in b32result:
             if symbol in map:
                 newdata.write(map[symbol])
+            elif symbol == "=":
+                pass 
             else:
+                # Randomly insert escape sequences so you cannot figure 
+                # out the correctness of a decryption based on incorrect 
+                # escape sequences .
+                if symbol not in unescape and random() > 0.5:
+                    newdata.write("X")
                 newdata.write(symbol)
                 
         return self.enigma.encode(newdata.getvalue())
@@ -254,13 +262,13 @@ class ArbitraryDataEnigma(object):
                 else:
                     newdata.write(symbol)
             else:
-                if symbol not in unescape:
-                    raise RuntimeError("Invalid escape sequence")
-                
-                symbol = unescape[symbol]
+                if symbol in unescape:
+                    symbol = unescape[symbol]
                 newdata.write(symbol)
                 next_escape = False 
-                
+        if newdata.tell() % 8 != 0:
+            padding = 8 - newdata.tell() % 8
+            newdata.write("="*padding)
         return base64.b32decode(newdata.getvalue())
 
 
@@ -348,7 +356,7 @@ if __name__ == "__main__":
     val = enigma_m4.encode("NCZW VUSX PNYM INHZ XMQX SFWX WLKJ AHSH NMCO CCAK UQPM KCSM HKSE INJU SBLK IOSX CKUB HMLL XCSJ USRR DVKO HULX WCCB GVLI YXEO AHXR HKKF VDRE WEZL XOBA FGYU JQUK GRTV UKAM EURB VEKS UHHV OYHA BCJW MAKL FKLM YFVN RIZR VVRT KOFD ANJM OLBG FFLE OPRG TFLV RHOW OPBE KVWM UQFM PWPA RMFH AGKX IIBG")
     print(val)"""
     
-    """enigma_m4 = EnigmaMachine(
+    enigma_m4 = EnigmaMachine(
         refcthin, 
         [beta, rotor(V), rotor(VI), rotor(VIII)], 
         etw_army,
@@ -361,7 +369,7 @@ if __name__ == "__main__":
     
     enigma_m4.set_rotor_state("CDSZ")
     enigma_m4.set_ring(*offsets("EPEL"))
-    
+    """
     print(enigma_m4.encode("LANO TCTO UARB BFPM HPHG CZXT DYGA HGUF XGEW KBLK GJWL QXXT
     GPJJ AVTO CKZF SLPP QIHZ FXOE BWII EKFZ LCLO AQJU LJOY HSSM BBGW HZAN
     VOII PYRB RTDJ QDJJ OQKC XWDN BBTY VXLY TAPG VEAT XSON PNYN QFUD BBHH
@@ -370,5 +378,5 @@ if __name__ == "__main__":
     DBWV HDFY HJOQ IHOR TDJD BWXE MEAY XGYQ XOHF DMYU XXNO JAZR SGHP LWML
     RECW WUTL RTTV LBHY OORG LGOW UXNX HMHY FAAC QEKT HSJW "))
     print(enigma_m4.get_rotor_state())"""
-    
+
     
