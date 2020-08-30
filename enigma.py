@@ -291,28 +291,29 @@ def rotor(num, off=offset("A")):
         return RotorPiece(ALPHABET, "FKQHTLXOCBJSPDZRAMEWNIUYGV", off, offset("Z"), offset("M"))
     else:
         raise RuntimeError("Unsupported rotor: {0}".format(num))
-        
+
+refa = Reflector(ALPHABET, "EJMZALYXVBWFCRQUONTSPIKHGD") # A retail enigma rotor?
+refb = Reflector(ALPHABET, "YRUHQSLDPXNGOKMIEBFZCWVJAT")
+refc = Reflector(ALPHABET, "FVPJIAOYEDRZXWGCTKUQSBNMHL")
+
+refbthin = Reflector(ALPHABET, "ENKQAUYWJICOPBLMDXZVFTHRGS")
+refcthin = Reflector(ALPHABET, "RDOBJNTKVEHMLFCWZAXGYIPSUQ")
+
+beta = NonRotatableRotor(ALPHABET, "LEYJVCNIXWPBQMDRTAKZGFUHOS", offset("A"), None)
+gamma = NonRotatableRotor(ALPHABET, "FSOKANUERHMBTIYCWLQPZXVGJD", offset("A"), None)
+
+etw_army = Stator(ALPHABET, ALPHABET)
+etw_commercial = Stator(ALPHABET, "QWERTZUIOASDFGHJKPYXCVBNML")
+etw_tirpitz =  Stator(ALPHABET, "KZROUQHYAIGBLWVSTDXFPNMCJE")
+
+#railway enigma k 
+refrail = Reflector(ALPHABET, "QYHOGNECVPUZTFDJAXWMKISRBL")
+rotorrailI = RotorPiece(ALPHABET, "JGDQOXUSCAMIFRVTPNEWKBLZYH", 0, offset("N"))
+rotorrailII = RotorPiece(ALPHABET, "NTZPSFBOKMWRCJDIVLAEYUXHGQ", 0, offset("E"))
+rotorrailIII = RotorPiece(ALPHABET, "JVIUBHTCDYAKEQZPOSGXNRMWFL", 0, offset("Y"))
         
 if __name__ == "__main__":
-    refa = Reflector(ALPHABET, "EJMZALYXVBWFCRQUONTSPIKHGD") # A retail enigma rotor?
-    refb = Reflector(ALPHABET, "YRUHQSLDPXNGOKMIEBFZCWVJAT")
-    refc = Reflector(ALPHABET, "FVPJIAOYEDRZXWGCTKUQSBNMHL")
-    
-    refbthin = Reflector(ALPHABET, "ENKQAUYWJICOPBLMDXZVFTHRGS")
-    refcthin = Reflector(ALPHABET, "RDOBJNTKVEHMLFCWZAXGYIPSUQ")
-    
-    beta = NonRotatableRotor(ALPHABET, "LEYJVCNIXWPBQMDRTAKZGFUHOS", offset("A"), None)
-    gamma = NonRotatableRotor(ALPHABET, "FSOKANUERHMBTIYCWLQPZXVGJD", offset("A"), None)
-    
-    etw_army = Stator(ALPHABET, ALPHABET)
-    etw_commercial = Stator(ALPHABET, "QWERTZUIOASDFGHJKPYXCVBNML")
-    etw_tirpitz =  Stator(ALPHABET, "KZROUQHYAIGBLWVSTDXFPNMCJE")
-    
-    #railway enigma k 
-    refrail = Reflector(ALPHABET, "QYHOGNECVPUZTFDJAXWMKISRBL")
-    rotorrailI = RotorPiece(ALPHABET, "JGDQOXUSCAMIFRVTPNEWKBLZYH", 0, offset("N"))
-    rotorrailII = RotorPiece(ALPHABET, "NTZPSFBOKMWRCJDIVLAEYUXHGQ", 0, offset("E"))
-    rotorrailIII = RotorPiece(ALPHABET, "JVIUBHTCDYAKEQZPOSGXNRMWFL", 0, offset("Y"))
+
     """enigma = EnigmaMachine(refa, [rotor(II), rotor(I), rotor(III)], plugboard = [
         "AM", "FI", "NV", "PS", "TU", "WZ"])
     enigma.set_rotor_state("ABL")
@@ -356,7 +357,7 @@ if __name__ == "__main__":
     val = enigma_m4.encode("NCZW VUSX PNYM INHZ XMQX SFWX WLKJ AHSH NMCO CCAK UQPM KCSM HKSE INJU SBLK IOSX CKUB HMLL XCSJ USRR DVKO HULX WCCB GVLI YXEO AHXR HKKF VDRE WEZL XOBA FGYU JQUK GRTV UKAM EURB VEKS UHHV OYHA BCJW MAKL FKLM YFVN RIZR VVRT KOFD ANJM OLBG FFLE OPRG TFLV RHOW OPBE KVWM UQFM PWPA RMFH AGKX IIBG")
     print(val)"""
     
-    enigma_m4 = EnigmaMachine(
+    """enigma_m4 = EnigmaMachine(
         refcthin, 
         [beta, rotor(V), rotor(VI), rotor(VIII)], 
         etw_army,
@@ -368,7 +369,7 @@ if __name__ == "__main__":
     #print(enigma_m4.get_rotor_state())
     
     enigma_m4.set_rotor_state("CDSZ")
-    enigma_m4.set_ring(*offsets("EPEL"))
+    enigma_m4.set_ring(*offsets("EPEL"))"""
     """
     print(enigma_m4.encode("LANO TCTO UARB BFPM HPHG CZXT DYGA HGUF XGEW KBLK GJWL QXXT
     GPJJ AVTO CKZF SLPP QIHZ FXOE BWII EKFZ LCLO AQJU LJOY HSSM BBGW HZAN
@@ -378,5 +379,12 @@ if __name__ == "__main__":
     DBWV HDFY HJOQ IHOR TDJD BWXE MEAY XGYQ XOHF DMYU XXNO JAZR SGHP LWML
     RECW WUTL RTTV LBHY OORG LGOW UXNX HMHY FAAC QEKT HSJW "))
     print(enigma_m4.get_rotor_state())"""
+    
+    enigma = EnigmaMachine(refa, [rotor(II), rotor(I), rotor(III)], plugboard = [
+        "AM", "FI", "NV", "PS", "TU", "WZ"])
+    enigma.set_rotor_state("TFC")
+    enigma.set_ring(24-1, 13-1, 22-1)
+    val = enigma.encode("RQPS OCM MGPGEH LOW WXJPZSQ GZ JFHZIUZK")
+    print(val)
 
     
